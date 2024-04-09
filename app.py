@@ -149,11 +149,10 @@ def getAnalysis(brand1,brand2):
         plt.text(x, y, f"{value:.1f}%", ha='center', va='bottom') 
     plt.tight_layout()
     plt.savefig(buff,format='png')
-    plt.close()
     buff.seek(0)
     plot_url = base64.b64encode(buff.getvalue()).decode('utf8')
     jsonobjs={}
-    bar1=mpld3.fig_to_html(bar1)
+
     jsonobjs["bar1"]=plot_url
     def process_data(brand1_path, brand2_path):
         all_data = []
@@ -170,7 +169,8 @@ def getAnalysis(brand1,brand2):
 
     df = process_data(brand1_path, brand2_path)
     print(df.head)
-    def generate_wordcloud(brand_data, brand_name):
+    
+    def generate_wordcloud(brand_data, brand_name,*ct):
         text = " ".join(tweet for tweet in brand_data['tweet_text_element'])
         wordcloud = WordCloud(background_color='white', width=800, height=600).generate(text)
 
@@ -178,16 +178,52 @@ def getAnalysis(brand1,brand2):
         plt.imshow(wordcloud, interpolation='bilinear')
         plt.axis("off")
         plt.title(f"Word Cloud for {brand_name}")
+        buff=io.BytesIO()
+        plt.savefig(buff,format='png')
+        buff.seek(0)
+        plot_url = base64.b64encode(buff.getvalue()).decode('utf8')
 
+        jsonobjs[ct]=plot_url
+        print(ct)
 
 
 
     # Generate word clouds for each brand
-    for brand in df['brand'].unique():
-        brand_data = df[df['brand'] == brand]
-        generate_wordcloud(brand_data, brand)
 
-    print(df.head)
+    # for brand in df['brand'].unique():
+    #     brand_data = df[df['brand'] == brand]
+    #     ct='bar2'
+    #     generate_wordcloud(brand_data, brand,ct)
+    #     ct='bar3'
+
+    brand_data = df[df['brand'] ==     brand1[0].upper()+brand1[1:]]
+    text = " ".join(tweet for tweet in brand_data['tweet_text_element'])
+    wordcloud = WordCloud(background_color='white', width=800, height=600).generate(text)
+
+    plt.figure()
+    plt.imshow(wordcloud, interpolation='bilinear')
+    plt.axis("off")
+    plt.title(f"Word Cloud for {brand1[0].upper()+brand1[1:]}")
+    buff=io.BytesIO()
+    plt.savefig(buff,format='png')
+    buff.seek(0)
+    plot_url = base64.b64encode(buff.getvalue()).decode('utf8')
+    jsonobjs["bar2"]=plot_url
+    print("bar2")    
+    brand_data = df[df['brand'] ==     brand2[0].upper()+brand2[1:]]
+    text = " ".join(tweet for tweet in brand_data['tweet_text_element'])
+    wordcloud = WordCloud(background_color='white', width=800, height=600).generate(text)
+
+    plt.figure()
+    plt.imshow(wordcloud, interpolation='bilinear')
+    plt.axis("off")
+    plt.title(f"Word Cloud for {brand2[0].upper()+brand2[1:]}")
+    buff=io.BytesIO()
+    plt.savefig(buff,format='png')
+    buff.seek(0)
+    plot_url = base64.b64encode(buff.getvalue()).decode('utf8')
+    jsonobjs["bar3"]=plot_url
+    print("bar3")
     sentiment_scores = {}  # Initialize an empty dictionary to store sentiment scores
 
     def calculate_feature_sentiment(tweet_text, feature_keywords):
@@ -254,10 +290,9 @@ def getAnalysis(brand1,brand2):
     plt.tight_layout()
     buff=io.BytesIO()
     plt.savefig(buff,format='png')
-    plt.close()
     buff.seek(0)
     plot_url = base64.b64encode(buff.getvalue()).decode('utf8')
-    jsonobjs["bar2"]=plot_url
+    jsonobjs["bar4"]=plot_url
     gfig=plt.figure()
     G = nx.Graph()
 
@@ -292,13 +327,11 @@ def getAnalysis(brand1,brand2):
     pos = nx.spring_layout(G)  # You can experiment with different layouts
 
     nx.draw(G, pos, with_labels=True, node_color=node_colors, width=edge_widths)
-    plt.show()
     buff=io.BytesIO()
     plt.savefig(buff,format='png')
-    plt.close()
     buff.seek(0)
     plot_url = base64.b64encode(buff.getvalue()).decode('utf8')
-    jsonobjs["bar3"]=plot_url
+    jsonobjs["bar5"]=plot_url
 
     # Check if 'day', 'brand1_sentiment', and 'brand2_sentiment' columns exist
     if all(col in dfr.columns for col in ['day', 'brand1_sentiment', 'brand2_sentiment']):
@@ -321,11 +354,11 @@ def getAnalysis(brand1,brand2):
 
         buff=io.BytesIO()
         plt.savefig(buff,format='png')
-        plt.close()
         buff.seek(0)
         plot_url = base64.b64encode(buff.getvalue()).decode('utf8')
-        jsonobjs["bar4"]=plot_url
+        jsonobjs["bar6"]=plot_url
         print(overtime)
     else:
         print(f"Error: The data file  is missing required columns.")
+ 
     return jsonobjs
