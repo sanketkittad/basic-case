@@ -348,7 +348,7 @@ def getAnalysis(brand1,brand2,category):
     x = range(len(feature_labels))
     bar_width = 0.35
     plt.bar(x, brand1_sentiment, bar_width, label=brand1[0].upper()+brand1[1:])
-    plt.bar([p + bar_width for p in x], brand2_sentiment, bar_width, label='Samsung')
+    plt.bar([p + bar_width for p in x], brand2_sentiment, bar_width, label=brand2[0].upper()+brand2[1:])
     plt.xlabel('Feature')
     plt.ylabel('Normalized Sentiment Score (0-1)')
     title = 'Comparison of Average Sentiment by Feature (Normalized)'
